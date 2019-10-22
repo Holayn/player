@@ -40,6 +40,14 @@ module.exports = class Player {
 
     this.isPlaying = true;
 
+    this.audio_stream.on('close', () => {
+      console.info('finished playing');
+      this.isPlaying = false;
+      this.decoded_stream.unpipe(this.speaker).end();
+      this.audio_stream.destroy();
+      this.speaker.close();
+    });
+
     console.info('play')
   }
 
