@@ -41,7 +41,12 @@ app.post('/play', (req, res) => {
 });
 
 app.post('/stop', (req, res) => {
-  player.stop();
+  player.pause();
+  res.sendStatus(200);
+});
+
+app.post('/resume', (req, res) => {
+  player.resume();
   res.sendStatus(200);
 });
 
