@@ -38,29 +38,28 @@ module.exports = class Player {
     this.audio_stream = this.decoded_stream.pipe(this.speaker);
 
     this.isPlaying = true;
-    
+
     console.info('play')
   }
 
   pause() {
-    this.decoded_stream.unpipe(this.speaker);
     this.isPlaying = false;
+    this.decoded_stream.unpipe(this.speaker);
   }
 
   resume() {
-    this.decoded_stream.pipe(this.speaker);
     this.isPlaying = true;
+    this.decoded_stream.pipe(this.speaker);
   }
 
   stop() {
+    this.isPlaying = false;
     this.decoded_stream.unpipe(this.speaker).end();
     this.audio_stream.destroy();
     this.speaker.close();
   }
 
   changeTrack(url) {
-    this.isPlaying = false;
-
     this.audio_stream.on('close', () => {
       console.info('playing stopped');
       this.play(url);
