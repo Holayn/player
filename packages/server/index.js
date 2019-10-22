@@ -4,15 +4,14 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const bodyParser = require('body-parser');
 
-const ytdl = require('ytdl-core');
-const Stream = require('stream');
-const FFmpeg = require("fluent-ffmpeg");
-const decoder = require('lame').Decoder
-const Speaker = require('speaker')
+const Player = require('./player');
+
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+let player;
 
 app.use(expressWinston.logger({
   transports: [
@@ -31,34 +30,21 @@ app.use(expressWinston.logger({
 
 app.listen(80, () => {
   console.info('Listening on 80');
+  init();
 });
-
 
 app.post('/play', (req, res) => {
   const url = req.body && req.body.url;
-
-  const audio = ytdl(url, {
-    audioFormat: 'mp3',
-  });
-
-  const spkr = new Speaker({
-    channels: 1,
-    bitDepth: 16,
-    sampleRate: 44100,
-  });
-
-  const ffmpeg = new FFmpeg(audio);
-
-  const stream = new Stream.PassThrough();
-
-  ffmpeg.format('mp3').pipe(stream);
-  stream.pipe(decoder())
-  .pipe(spkr);
+  player.play(url);
 
   res.sendStatus(200);
 });
 
 app.post('/stop', (req, res) => {
-  // decodedStream.unpipe(player.speaker).end();
+  player.stop();
   res.sendStatus(200);
 });
+
+function init() {
+  player = new Player();
+}
