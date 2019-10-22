@@ -28,8 +28,9 @@ module.exports = class Player {
 
     ffmpeg.format('mp3').on('error', (err, stdout, stderr) => {
       setTimeout(() => {
-        console.log('something went wrong');
+        console.log('something went wrong, retrying...');
         this.speaker.close();
+        this.play(url);
         return;
       }, 3000);
     }).pipe(stream)
