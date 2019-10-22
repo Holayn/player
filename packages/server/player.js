@@ -6,11 +6,7 @@ const decoder = require('lame').Decoder;
 
 module.exports = class Player {
   constructor() {
-    this.speaker = new Speaker({
-      channels: 1,
-      bitDepth: 16,
-      sampleRate: 44100,
-    });
+    _createSpeaker();
   }
 
   play(url) {
@@ -31,6 +27,10 @@ module.exports = class Player {
     this.stream.unpipe(this.speaker).end();
     this.stream.end();
     this.speaker.destroy();
+    _createSpeaker();
+  }
+
+  _createSpeaker() {
     this.speaker = new Speaker({
       channels: 1,
       bitDepth: 16,
