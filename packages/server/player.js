@@ -3,21 +3,32 @@ const ytdl = require('ytdl-core');
 const Stream = require('stream');
 const FFmpeg = require("fluent-ffmpeg");
 const decoder = require('lame').Decoder;
+const ytpl = require('ytpl');
 
 module.exports = class Player {
   constructor() {
     this.isPlaying = false;
     this.decoded_stream = null;
     this.audio_stream = null;
+
+    this.queue = [];
   }
 
-  play(url) {
-    this._createSpeaker();
+  get playing() {
+    return this.isPlaying;
+  }
 
-    if (this.isPlaying) {
-      this.changeTrack(url);
+  load(url) {
+    if (!this.playing && this.queue.length === 0) {
+      this._play(url)
       return;
     }
+
+    this.queue.push(url);
+  }
+
+  _play(url) {
+    this._createSpeaker();
 
     const audio = ytdl(url, {
       audioFormat: 'mp3',
@@ -30,7 +41,7 @@ module.exports = class Player {
       setTimeout(() => {
         console.log('something went wrong, retrying...');
         this.speaker.close();
-        this.play(url);
+        this._play(url);
         return;
       }, 3000);
     }).pipe(stream)
@@ -41,11 +52,8 @@ module.exports = class Player {
     this.isPlaying = true;
 
     this.audio_stream.on('close', () => {
-      console.info('finished playing');
-      this.isPlaying = false;
-      this.decoded_stream.unpipe(this.speaker).end();
-      this.audio_stream.destroy();
-      this.speaker.close();
+      console.info('finished playing track');
+      this._next();
     });
 
     console.info('play')
@@ -68,10 +76,26 @@ module.exports = class Player {
     this.speaker.close();
   }
 
-  changeTrack(url) {
+  _next() {
+    this._closeAllListeners();
+
+    const next = this.queue.shift();
+    if (next) {
+      console.info('playing next track');
+      this._play(next);
+    }
+  }
+
+  skip() {
+    this._closeAllListeners();
+
+    if (!this.playing) {
+      throw new Error('nothing to skip');
+    }
+
     this.audio_stream.on('close', () => {
       console.info('playing stopped');
-      this.play(url);
+      this._next();
     });
 
     this.speaker.on('close',  () => {
@@ -81,11 +105,38 @@ module.exports = class Player {
     this.stop();
   }
 
+  playlist(url) {
+    ytpl(url, (err, playlist) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      
+      const canPlay = this.queue.length === 0;
+      const items = playlist.items;
+      items.forEach((vid) => {
+        const link  = vid.url_simple;
+        this.queue.push(link);
+      });
+
+      if (canPlay) {
+        this._next();
+      }
+
+    });
+  }
+
   _createSpeaker() {
     this.speaker = new Speaker({
       channels: 1,
       bitDepth: 16,
       sampleRate: 44100,
     });
+  }
+
+  _closeAllListeners() {
+    if (this.playing) {
+      this.audio_stream.removeAllListeners('close');
+    }
   }
 }

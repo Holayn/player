@@ -33,12 +33,19 @@ app.listen(80, () => {
   init();
 });
 
-app.post('/play', (req, res) => {
+app.post('/load', (req, res) => {
   const url = req.body && req.body.url;
-  player.play(url);
+  player.load(url);
 
   res.sendStatus(200);
 });
+
+app.post('/playlist', (req, res) => {
+  const url = req.body && req.body.url;
+  player.playlist(url);
+
+  res.sendStatus(200);
+})
 
 app.post('/stop', (req, res) => {
   player.pause();
@@ -49,6 +56,18 @@ app.post('/resume', (req, res) => {
   player.resume();
   res.sendStatus(200);
 });
+
+app.post('/next', (req, res) => {
+  try {
+    player.skip();
+  } catch (e) {
+    console.error(e);
+    // res.statusMessage = e;
+    // res.sendStatus(405);
+  }
+
+  res.sendStatus(200);
+})
 
 function init() {
   player = new Player();
