@@ -95,11 +95,11 @@ module.exports = class Player {
 
     this.audio_stream.on('close', () => {
       console.info('playing stopped');
-      this._next();
     });
 
     this.speaker.on('close',  () => {
       console.info('closing speaker');
+      this._next();
     });
 
     this.stop();
