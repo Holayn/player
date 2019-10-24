@@ -28,8 +28,8 @@ app.use(expressWinston.logger({
   ignoreRoute: function (req, res) { return false; }
 }));
 
-app.listen(80, () => {
-  console.info('Listening on 80');
+app.listen(8000, () => {
+  console.info('Listening on 8000');
   init();
 });
 
