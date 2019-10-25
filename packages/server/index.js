@@ -63,7 +63,9 @@ app.get('/now-playing', async (req, res) => {
     title: trackInfo && trackInfo.title,
     info: trackInfo,
   });
-})
+});
+
+app.get('/queue', async (req, res) => {})
 
 app.post('/next', (req, res) => {
   try {
