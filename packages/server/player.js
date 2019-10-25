@@ -93,12 +93,20 @@ module.exports = class Player {
       throw new Error('nothing to skip');
     }
 
-    this.audio_stream.on('close', () => {
-      console.info('playing stopped');
+    let audioStreamClose = new Promise((resolve) => {
+      this.audio_stream.on('close', () => {
+        console.info('playing stopped');
+        resolve();
+      });
+    });
+    let speakerClose = new Promise((resolve) => {
+      this.speaker.on('close', () => {
+        console.info('closing speaker');
+        resolve();
+      });
     });
 
-    this.speaker.on('close',  () => {
-      console.info('closing speaker');
+    Promise.all([audioStreamClose, speakerClose]).then(() => {
       this._next();
     });
 
