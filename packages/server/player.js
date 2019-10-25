@@ -1,13 +1,20 @@
 const ytpl = require('ytpl');
+const ytdl = require('ytdl-core');
 
 const Speaker = require('./speaker');
 
 module.exports = class Player {
   constructor() {
+    // state
     this.isPlaying = false;
+    this.nowPlaying = '';
+    
     this.speaker = new Speaker();
-
     this.queue = [];
+  }
+
+  getNowPlaying() {
+    return ytdl.getInfo(this.nowPlaying);
   }
 
   load(url) {
@@ -59,6 +66,7 @@ module.exports = class Player {
     if (!this.isPlaying) {
       return;
     }
+    this.nowPlaying = '';
     this.isPlaying = false;
     this.speaker.stop();
   }
@@ -66,6 +74,9 @@ module.exports = class Player {
   skip() {
     if (!this.isPlaying) {
       return;
+    }
+    if (!this.nowPlaying) {
+      throw new Error('nothing playing');
     }
 
     this.speaker.stop().then(() => {
@@ -76,6 +87,7 @@ module.exports = class Player {
 
   async _play(url) {
     this.isPlaying = true;
+    this.nowPlaying = url;
 
     await this.speaker.play(url);
 

@@ -57,6 +57,14 @@ app.post('/resume', (req, res) => {
   res.sendStatus(200);
 });
 
+app.get('/now-playing', async (req, res) => {
+  const trackInfo = await player.getNowPlaying();
+  res.status(200).send({
+    title: trackInfo && trackInfo.title,
+    info: trackInfo,
+  });
+})
+
 app.post('/next', (req, res) => {
   try {
     player.skip();
