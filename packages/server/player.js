@@ -3,27 +3,45 @@ const ytdl = require('ytdl-core');
 
 const Speaker = require('./speaker');
 
+class Track {
+  constructor(url) {
+    this.url = url;
+    this.name = '';
+  }
+
+  async getInfo() {
+    const info = await ytdl.getInfo(this.url);
+    this.name = info.title;
+  }
+}
+
 module.exports = class Player {
   constructor() {
     // state
     this.isPlaying = false;
-    this.nowPlaying = '';
+    this.nowPlaying = null;
     
     this.speaker = new Speaker();
     this.queue = [];
   }
 
   getNowPlaying() {
-    return ytdl.getInfo(this.nowPlaying);
+    return this.nowPlaying;
   }
 
-  load(url) {
+  getQueue() {
+    return this.queue;
+  }
+
+  async load(url) {
+    const track = new Track(url);
+    await track.getInfo();
     if (!this.isPlaying && this.queue.length === 0) {
-      this._play(url)
+      this._play(track)
       return;
     }
 
-    this.queue.push(url);
+    this.queue.push(track);
   }
 
   playlist(url) {
@@ -37,7 +55,9 @@ module.exports = class Player {
       const items = playlist.items;
       items.forEach((vid) => {
         const link  = vid.url_simple;
-        this.queue.push(link);
+        const track = new Track(link);
+        track.name = vid.title;
+        this.queue.push(track);
       });
 
       if (canPlay) {
@@ -66,41 +86,41 @@ module.exports = class Player {
     if (!this.isPlaying) {
       return;
     }
-    this.nowPlaying = '';
+    this.nowPlaying = null;
     this.isPlaying = false;
     this.speaker.stop();
   }
 
   skip() {
-    if (!this.isPlaying) {
-      return;
-    }
     if (!this.nowPlaying) {
       throw new Error('nothing playing');
     }
 
     this.speaker.stop().then(() => {
       this.isPlaying = false;
+      this.nowPlaying = null;
       this._next();
     });
   }
 
-  async _play(url) {
+  async _play(track) {
     this.isPlaying = true;
-    this.nowPlaying = url;
+    this.nowPlaying = track;
 
-    await this.speaker.play(url);
+    await this.speaker.play(track.url);
 
     if (this.queue.length > 0) {
       this._next();
+    } else {
+      this.stop();
     }
   }
 
   _next() {
-    const next = this.queue.shift();
-    if (next) {
+    const nextTrack = this.queue.shift();
+    if (nextTrack) {
       console.info('playing next track');
-      this._play(next);
+      this._play(nextTrack);
     }
   }
 }

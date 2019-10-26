@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 
 const Player = require('./player');
 
-
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -58,14 +57,14 @@ app.post('/resume', (req, res) => {
 });
 
 app.get('/now-playing', async (req, res) => {
-  const trackInfo = await player.getNowPlaying();
-  res.status(200).send({
-    title: trackInfo && trackInfo.title,
-    info: trackInfo,
-  });
+  const track = player.getNowPlaying();
+  res.status(200).send(track);
 });
 
-app.get('/queue', async (req, res) => {})
+app.get('/queue', async (req, res) => {
+  const queue = player.getQueue();
+  res.status(200).send(queue);
+})
 
 app.post('/next', (req, res) => {
   try {
