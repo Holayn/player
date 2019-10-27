@@ -86,6 +86,7 @@ module.exports = class Player {
     if (!this.isPlaying) {
       return;
     }
+    console.info('stopping player');
     this.nowPlaying = null;
     this.isPlaying = false;
     this.speaker.stop();
@@ -119,7 +120,7 @@ module.exports = class Player {
   _next() {
     const nextTrack = this.queue.shift();
     if (nextTrack) {
-      console.info('playing next track');
+      console.info('playing next track: ' + nextTrack.name);
       this._play(nextTrack);
     }
   }
