@@ -11,3 +11,5 @@ declare global {
     }
   }
 }
+
+declare const M: any;

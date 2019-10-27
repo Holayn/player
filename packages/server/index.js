@@ -32,9 +32,14 @@ app.listen(8000, () => {
   init();
 });
 
-app.post('/load', (req, res) => {
+app.post('/load', async (req, res) => {
   const url = req.body && req.body.url;
-  player.load(url);
+  try {
+    await player.load(url);
+  } catch (e) {
+    res.sendStatus(500);
+    return;
+  }
 
   res.sendStatus(200);
 });
