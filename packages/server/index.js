@@ -79,13 +79,7 @@ app.get('/queue', async (req, res) => {
 })
 
 app.post('/next', (req, res) => {
-  try {
-    player.skip();
-  } catch (e) {
-    console.error(e);
-    res.statusMessage = e;
-    res.sendStatus(405);
-  }
+  player.skip();
 
   res.sendStatus(200);
 })
