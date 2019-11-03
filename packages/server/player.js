@@ -93,7 +93,7 @@ module.exports = class Player {
 
   skip() {
     if (!this.nowPlaying) {
-      throw new Error('nothing playing');
+      return;
     }
 
     this.speaker.stop().then(() => {
