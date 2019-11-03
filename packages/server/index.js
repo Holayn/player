@@ -32,16 +32,24 @@ app.listen(8000, () => {
   init();
 });
 
-app.post('/load', (req, res) => {
+app.post('/load', async (req, res) => {
   const url = req.body && req.body.url;
-  player.load(url);
-
-  res.sendStatus(200);
+  try {
+    await player.load(url);
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(500);
+    return;
+  }
 });
 
-app.post('/playlist', (req, res) => {
+app.post('/playlist', async (req, res) => {
   const url = req.body && req.body.url;
-  player.playlist(url);
+  try {
+    await player.playlist(url);
+  } catch (e) {
+    res.status(500).send(e);
+  }
 
   res.sendStatus(200);
 })
@@ -58,6 +66,10 @@ app.post('/resume', (req, res) => {
 
 app.get('/now-playing', async (req, res) => {
   const track = player.getNowPlaying();
+  if (!track) {
+    res.sendStatus(204);
+    return;
+  }
   res.status(200).send(track);
 });
 
@@ -71,8 +83,8 @@ app.post('/next', (req, res) => {
     player.skip();
   } catch (e) {
     console.error(e);
-    // res.statusMessage = e;
-    // res.sendStatus(405);
+    res.statusMessage = e;
+    res.sendStatus(405);
   }
 
   res.sendStatus(200);

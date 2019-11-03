@@ -37,7 +37,7 @@ module.exports = class Player {
     const track = new Track(url);
     await track.getInfo();
     if (!this.isPlaying && this.queue.length === 0) {
-      this._play(track)
+      this._play(track);
       return;
     }
 
@@ -45,24 +45,29 @@ module.exports = class Player {
   }
 
   playlist(url) {
-    ytpl(url, (err, playlist) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      
-      const canPlay = this.queue.length === 0;
-      const items = playlist.items;
-      items.forEach((vid) => {
-        const link  = vid.url_simple;
-        const track = new Track(link);
-        track.name = vid.title;
-        this.queue.push(track);
-      });
+    return new Promise((resolve, reject) => {
+      ytpl(url, (err, playlist) => {
+        if (err) {
+          console.error(err);
+          reject();
+          return;
+        }
+        
+        const canPlay = this.queue.length === 0;
+        const items = playlist.items;
+        items.forEach((vid) => {
+          const link  = vid.url_simple;
+          const track = new Track(link);
+          track.name = vid.title;
+          this.queue.push(track);
+        });
+  
+        if (canPlay) {
+          this._next();
+        }
 
-      if (canPlay) {
-        this._next();
-      }
+        resolve();
+      });
     });
   }
 
@@ -86,6 +91,7 @@ module.exports = class Player {
     if (!this.isPlaying) {
       return;
     }
+    console.info('stopping player');
     this.nowPlaying = null;
     this.isPlaying = false;
     this.speaker.stop();
@@ -104,10 +110,16 @@ module.exports = class Player {
   }
 
   async _play(track) {
+    console.info('playing track: ' + track.name);
     this.isPlaying = true;
     this.nowPlaying = track;
 
-    await this.speaker.play(track.url);
+    try {
+      await this.speaker.play(track.url);
+    } catch (e) {
+      return e;
+    }
+
 
     if (this.queue.length > 0) {
       this._next();
@@ -119,7 +131,6 @@ module.exports = class Player {
   _next() {
     const nextTrack = this.queue.shift();
     if (nextTrack) {
-      console.info('playing next track');
       this._play(nextTrack);
     }
   }
