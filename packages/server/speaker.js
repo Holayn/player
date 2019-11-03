@@ -109,8 +109,12 @@ module.exports = class Speaker {
   }
 
   _destroy() {
-    return this._closeSpeaker().then(() => {
-      return this._closeStreams();
-    })
+    return new Promise((resolve, reject) => {
+      this._closeStreams().then(() => {
+        this._closeSpeaker().then(() => {
+          resolve();
+        })
+      });
+    });
   }
 }
