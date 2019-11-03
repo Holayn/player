@@ -61,13 +61,10 @@ export default class Home extends Vue {
       });
       this.loadTrackUrl = '';
 
-      if (this.isSuccess(res.status)) {
-        this.getNowPlaying();
-      } else {
+      if (!this.isSuccess(res.status)) {
         this.handleError('error loading track');
       }
     } catch (e) {
-      console.error('err');
       this.handleError(e);
     }
   }
@@ -76,7 +73,7 @@ export default class Home extends Vue {
     M.toast({html: err});
   }
 
-  private isSuccess(status) {
+  private isSuccess(status: number) {
     if (status === 200) {
       return true;
     }

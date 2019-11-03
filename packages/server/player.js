@@ -37,7 +37,8 @@ module.exports = class Player {
     const track = new Track(url);
     await track.getInfo();
     if (!this.isPlaying && this.queue.length === 0) {
-      return this._play(track)
+      this._play(track);
+      return;
     }
 
     this.queue.push(track);
@@ -104,6 +105,7 @@ module.exports = class Player {
   }
 
   async _play(track) {
+    console.info('playing track: ' + track.name);
     this.isPlaying = true;
     this.nowPlaying = track;
 
@@ -124,7 +126,6 @@ module.exports = class Player {
   _next() {
     const nextTrack = this.queue.shift();
     if (nextTrack) {
-      console.info('playing next track: ' + nextTrack.name);
       this._play(nextTrack);
     }
   }

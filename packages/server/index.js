@@ -36,12 +36,11 @@ app.post('/load', async (req, res) => {
   const url = req.body && req.body.url;
   try {
     await player.load(url);
+    res.sendStatus(200);
   } catch (e) {
     res.sendStatus(500);
     return;
   }
-
-  res.sendStatus(200);
 });
 
 app.post('/playlist', (req, res) => {
@@ -76,8 +75,8 @@ app.post('/next', (req, res) => {
     player.skip();
   } catch (e) {
     console.error(e);
-    // res.statusMessage = e;
-    // res.sendStatus(405);
+    res.statusMessage = e;
+    res.sendStatus(405);
   }
 
   res.sendStatus(200);
