@@ -45,24 +45,29 @@ module.exports = class Player {
   }
 
   playlist(url) {
-    ytpl(url, (err, playlist) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-      
-      const canPlay = this.queue.length === 0;
-      const items = playlist.items;
-      items.forEach((vid) => {
-        const link  = vid.url_simple;
-        const track = new Track(link);
-        track.name = vid.title;
-        this.queue.push(track);
-      });
+    return new Promise((resolve, reject) => {
+      ytpl(url, (err, playlist) => {
+        if (err) {
+          console.error(err);
+          reject();
+          return;
+        }
+        
+        const canPlay = this.queue.length === 0;
+        const items = playlist.items;
+        items.forEach((vid) => {
+          const link  = vid.url_simple;
+          const track = new Track(link);
+          track.name = vid.title;
+          this.queue.push(track);
+        });
+  
+        if (canPlay) {
+          this._next();
+        }
 
-      if (canPlay) {
-        this._next();
-      }
+        resolve();
+      });
     });
   }
 

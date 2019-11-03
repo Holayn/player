@@ -43,9 +43,13 @@ app.post('/load', async (req, res) => {
   }
 });
 
-app.post('/playlist', (req, res) => {
+app.post('/playlist', async (req, res) => {
   const url = req.body && req.body.url;
-  player.playlist(url);
+  try {
+    await player.playlist(url);
+  } catch (e) {
+    res.status(500).send(e);
+  }
 
   res.sendStatus(200);
 })
@@ -62,6 +66,10 @@ app.post('/resume', (req, res) => {
 
 app.get('/now-playing', async (req, res) => {
   const track = player.getNowPlaying();
+  if (!track) {
+    res.sendStatus(204);
+    return;
+  }
   res.status(200).send(track);
 });
 
