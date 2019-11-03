@@ -5,7 +5,8 @@
   "repository": "https://github.com/Holayn/player.git",
   "license": "MIT",
   "scripts": {
-    "start:server": "yarn --cwd packages/server start"
+    "start:server": "yarn --cwd packages/server start",
+    "start:vue": "yarn --cwd packages/vue serve"
   },
   "devDependencies": {
     "lerna": "^3.18.1"

@@ -20,7 +20,7 @@ module.exports = class Speaker {
 
   async play(url) {
     if (this.speaker) {
-      await this._closeSpeaker();
+      this._closeSpeaker();
     }
     this.init();
 
