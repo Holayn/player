@@ -34,6 +34,7 @@ module.exports = class Player {
   }
 
   async load(url) {
+    console.log('load track: ' + url);
     const track = new Track(url);
     await track.getInfo();
     if (!this.isPlaying && this.queue.length === 0) {

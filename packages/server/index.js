@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 
 const Player = require('./player');
 
+const {receiveMail} = require('./mail');
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
@@ -86,4 +88,6 @@ app.post('/next', (req, res) => {
 
 function init() {
   player = new Player();
+
+  receiveMail(player);
 }
