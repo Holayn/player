@@ -7,12 +7,12 @@ const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
-const TOKEN_PATH = './google/token.json';
+const TOKEN_PATH = './src/google/token.json';
 
 async function executeAPI(cb) {
   return new Promise((res, rej) => {
     // Load client secrets from a local file.
-    fs.readFile('./google/credentials.json', (err, content) => {
+    fs.readFile('./src/google/credentials.json', (err, content) => {
       if (err) {
         console.log('Error loading client secret file:', err);
         rej();
