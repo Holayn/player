@@ -8,8 +8,16 @@ async function playMusicHandler(player, subject) {
   if (subject.match(MAIL_MATCHES[0])) {
     const tracks = await db.getTracks();
 
-    const index = Math.floor(Math.random() * Math.floor(tracks.length-1));
-    player.load(tracks[index]);
+    for(let i=0; i<tracks.length; i++) {
+      let rand = Math.floor(Math.random() * tracks.length-(i+1)) + (i+1);
+      let temp = tracks[i];
+      tracks[i] = tracks[rand];
+      tracks[rand] = temp;
+    }
+
+    tracks.forEach(async (track) => {
+      await player.load(track);
+    });
   }
 }
 
