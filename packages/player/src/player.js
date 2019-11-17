@@ -112,7 +112,9 @@ module.exports = class Player {
   }
 
   adjustVolume(volume) {
-    this.speaker.adjustVolume(volume);
+    if (this.speaker) {
+      this.speaker.adjustVolume(volume);
+    }
   }
 
   async _play(track) {
