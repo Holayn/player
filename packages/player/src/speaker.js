@@ -9,6 +9,7 @@ module.exports = class Speaker {
   constructor() {
     this.decoded_stream = null;
     this.audio_stream = null;
+    this.currentVolume = 1;
   }
 
   init() {
@@ -67,6 +68,7 @@ module.exports = class Speaker {
   }
 
   adjustVolume(volume) {
+    this.currentVolume = volume;
     this.volume.setVolume(volume);
   }
 
@@ -77,7 +79,7 @@ module.exports = class Speaker {
       sampleRate: 44100,
     });
     this.volume = new Volume();
-    this.volume.setVolume(1);
+    this.volume.setVolume(this.currentVolume);
   }
 
   _closeAllListeners() {
