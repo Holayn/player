@@ -1,0 +1,17 @@
+{
+  "name": "player",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/player.js",
+  "private": true,
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fluent-ffmpeg": "^2.1.2",
+    "lame": "^1.2.4",
+    "pcm-volume": "^1.0.0",
+    "speaker": "0.4.0",
+    "ytdl-core": "^1.0.0",
+    "ytpl": "^0.1.17"
+  }
+}

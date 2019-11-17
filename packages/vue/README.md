@@ -1,5 +1,7 @@
 # player
 
+App to communicate with player server
+
 ## Project setup
 ```
 yarn install

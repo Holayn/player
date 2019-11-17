@@ -34,6 +34,7 @@ module.exports = class Player {
   }
 
   async load(url) {
+    console.log('load track: ' + url);
     const track = new Track(url);
     await track.getInfo();
     if (!this.isPlaying && this.queue.length === 0) {
@@ -94,12 +95,13 @@ module.exports = class Player {
     console.info('stopping player');
     this.nowPlaying = null;
     this.isPlaying = false;
+    this.queue = [];
     this.speaker.stop();
   }
 
   skip() {
     if (!this.nowPlaying) {
-      throw new Error('nothing playing');
+      return;
     }
 
     this.speaker.stop().then(() => {
@@ -107,6 +109,12 @@ module.exports = class Player {
       this.nowPlaying = null;
       this._next();
     });
+  }
+
+  adjustVolume(volume) {
+    if (this.speaker) {
+      this.speaker.adjustVolume(volume);
+    }
   }
 
   async _play(track) {
@@ -129,6 +137,9 @@ module.exports = class Player {
   }
 
   _next() {
+    if (this.queue.length === 0) {
+      return;
+    }
     const nextTrack = this.queue.shift();
     if (nextTrack) {
       this._play(nextTrack);

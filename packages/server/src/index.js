@@ -4,7 +4,8 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const bodyParser = require('body-parser');
 
-const Player = require('./player');
+const Player = require('player');
+const {receiveMail} = require('./mail');
 
 const app = express();
 app.use(cors());
@@ -54,13 +55,18 @@ app.post('/playlist', async (req, res) => {
   res.sendStatus(200);
 })
 
-app.post('/stop', (req, res) => {
+app.post('/pause', (req, res) => {
   player.pause();
   res.sendStatus(200);
 });
 
 app.post('/resume', (req, res) => {
   player.resume();
+  res.sendStatus(200);
+});
+
+app.post('/stop', (req, res) => {
+  player.stop();
   res.sendStatus(200);
 });
 
@@ -79,17 +85,20 @@ app.get('/queue', async (req, res) => {
 })
 
 app.post('/next', (req, res) => {
-  try {
-    player.skip();
-  } catch (e) {
-    console.error(e);
-    res.statusMessage = e;
-    res.sendStatus(405);
-  }
+  player.skip();
+
+  res.sendStatus(200);
+})
+
+app.post('/adjustVolume', (req, res) => {
+  const vol = req.body && req.body.volume;
+  player.adjustVolume(vol);
 
   res.sendStatus(200);
 })
 
 function init() {
   player = new Player();
+
+  receiveMail(player);
 }
