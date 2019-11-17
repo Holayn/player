@@ -16,10 +16,15 @@ async function receiveMail(player) {
   // most recent message's historyId and store that
   // on subscription receive message, use historyId to get new message
   // set new historyId in store
-  const messages = await client.executeAPI(_getMessages);
-  const msgId = messages[0].id;
-  const message = await client.executeAPI(_getMessage.bind(null, msgId));
-  latestHistoryId = message.historyId;
+  try {
+    const messages = await client.executeAPI(_getMessages);
+    const msgId = messages[0].id;
+    const message = await client.executeAPI(_getMessage.bind(null, msgId));
+    console.log('setting latest history id: ' + message.historyId);
+    latestHistoryId = message.historyId;
+  } catch(e) {
+    console.log(e);
+  }
   
 
   subscription.on('message', async (msg) => {
@@ -30,22 +35,38 @@ async function receiveMail(player) {
 
     const historyId = obj.historyId;
     
-    const history = await client.executeAPI(_history.bind(null, latestHistoryId));
-    if (history && history[0]) {
-      const msgId = history[0].messages[0].id;
-      const message = await client.executeAPI(_getMessage.bind(null, msgId));
-      const subjectObj = message && message.payload && message.payload.headers.filter((header) => {
-        return header.name === 'Subject';
-      });
-      console.log(subjectObj)
-      const subject = subjectObj && subjectObj[0] && subjectObj[0].value;
+    try {
+      const history = await client.executeAPI(_history.bind(null, latestHistoryId));
+      if (history && history.length) {
+        // look for messages added
+        const messagesAdded = history.filter((message) => {
+          return message.messagesAdded;
+        })
 
-      // do something here
-      playMusicHandler(player, subject);
+        messagesAdded.forEach(async (message) => {
+          try {
+            const msgId = message.messagesAdded[0].message.id;
+            const messageRes = await client.executeAPI(_getMessage.bind(null, msgId));
+            const subjectObj = messageRes && messageRes.payload && messageRes.payload.headers.filter((header) => {
+              return header.name === 'Subject';
+            });
+            console.log(subjectObj)
+            const subject = subjectObj && subjectObj[0] && subjectObj[0].value;
+
+            // do something here
+            playMusicHandler(player, subject);
+          } catch (e) {
+            console.log('something went wrong');
+          }
+        })
+      }
+
+      // update latest history id
+      console.log('setting latest history id: ' + historyId);
+      latestHistoryId = historyId;
+    } catch(e) {
+      console.log('failed to process message');
     }
-
-    // update latest history id
-    latestHistoryId = historyId;
 
     msg.ack();
   })
