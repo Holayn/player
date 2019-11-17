@@ -10,8 +10,8 @@
     <div class="row">
       <div class="col s10">
         <div class="input-field">
-          <input v-model="loadTrackUrl" id="load-track" type="text"/>
-          <label for="load-track">Load track</label>
+          <input v-model="loadTrackUrl" type="text"/>
+          <label>Load track</label>
         </div>
       </div>
       <div class="col s2 load-col">
@@ -21,8 +21,8 @@
     <div class="row">
       <div class="col s10">
         <div class="input-field">
-          <input v-model="loadPlaylistUrl" id="load-playlist" type="text"/>
-          <label for="load-playlist">Load playlist</label>
+          <input v-model="loadPlaylistUrl" type="text"/>
+          <label>Load playlist</label>
         </div>
       </div>
       <div class="col s2 load-col">
@@ -30,11 +30,21 @@
       </div>
     </div>
     <div class="row">
-      <div class="col s2 load-col">
-        <button class="waves-effect waves-light btn" @click="pause()">Pause</button>
+      <div class="col s10">
+        <div class="input-field">
+          <input v-model="vol" type="text"/>
+          <label>Volume (0-1.0)</label>
+        </div>
       </div>
       <div class="col s2 load-col">
+        <button class="waves-effect waves-light btn" @click="adjustVolume()">Set</button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s2 load-col">
+        <button class="waves-effect waves-light btn" @click="pause()">Pause</button>
         <button class="waves-effect waves-light btn" @click="resume()">Resume</button>
+        <button class="waves-effect waves-light btn" @click="stop()">Stop</button>
       </div>
       <div class="col s2 load-col">
         <button class="waves-effect waves-light btn" @click="next()">Next</button>
@@ -50,10 +60,11 @@ import { Toast } from 'materialize-css';
 @Component({
   components: {},
 })
-export default class Home extends Vue {
+export default class Player extends Vue {
   public nowPlaying: string = '';
   public loadTrackUrl: string = '';
   public loadPlaylistUrl: string = '';
+  public vol: string = '';
   public async getNowPlaying() {
     const res = await fetch(`${this.$store.getters.getBaseUrl}/now-playing`).catch((e) => {
       this.handleError(e);
@@ -113,6 +124,42 @@ export default class Home extends Vue {
 
   public async pause() {
     try {
+      const res: any = await fetch(`${this.$store.getters.getBaseUrl}/pause`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).catch((e) => {
+        this.handleError(e);
+      });
+      if (!this.isSuccess(res)) {
+        this.handleError('error');
+      }
+    } catch (e) {
+      this.handleError(e);
+    }
+  }
+
+  public async resume() {
+    try {
+      const res: any = await fetch(`${this.$store.getters.getBaseUrl}/resume`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).catch((e) => {
+        this.handleError(e);
+      });
+      if (!this.isSuccess(res)) {
+        this.handleError('error');
+      }
+    } catch (e) {
+      this.handleError(e);
+    }
+  }
+
+  public async stop() {
+    try {
       const res: any = await fetch(`${this.$store.getters.getBaseUrl}/stop`, {
         method: 'post',
         headers: {
@@ -147,13 +194,16 @@ export default class Home extends Vue {
     }
   }
 
-  public async resume() {
+  public async adjustVolume() {
     try {
-      const res: any = await fetch(`${this.$store.getters.getBaseUrl}/resume`, {
+      const res: any = await fetch(`${this.$store.getters.getBaseUrl}/adjustVolume`, {
         method: 'post',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          volume: this.vol,
+        }),
       }).catch((e) => {
         this.handleError(e);
       });
@@ -183,5 +233,9 @@ export default class Home extends Vue {
 }
 .load-col {
   margin: auto;
+  
+  button {
+    margin: 10px 5px;
+  }
 }
 </style>
