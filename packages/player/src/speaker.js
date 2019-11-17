@@ -59,11 +59,11 @@ module.exports = class Speaker {
   }
 
   pause() {
-    this.decoded_stream.unpipe(this.speaker);
+    this.audio_stream.unpipe(this.speaker);
   }
 
   resume() {
-    this.decoded_stream.pipe(this.speaker);
+    this.audio_stream.pipe(this.speaker);
   }
 
   adjustVolume(volume) {
