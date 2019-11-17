@@ -47,12 +47,12 @@ module.exports = class Speaker {
       sampleRate: 44100,
     }));
     this.audio_stream = this.decoded_stream.pipe(this.volume);
-    this.audio_stream.pipe(this.speaker);
+    this.current_stream = this.audio_stream.pipe(this.speaker);
 
     console.info('play');
 
     return new Promise((resolve) => {
-      this.audio_stream.on('close', () => {
+      this.current_stream.on('close', () => {
         console.info('finished playing track');
         resolve();
       });
