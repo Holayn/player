@@ -3,6 +3,7 @@ const ytdl = require('ytdl-core');
 const Stream = require('stream');
 const FFmpeg = require("fluent-ffmpeg");
 const decoder = require('lame').Decoder;
+const Volume = require('pcm-volume');
 
 module.exports = class Speaker {
   constructor() {
@@ -39,8 +40,13 @@ module.exports = class Speaker {
       }, 3000);
     }).pipe(stream)
 
-    this.decoded_stream = stream.pipe(decoder());
-    this.audio_stream = this.decoded_stream.pipe(this.speaker);
+    this.decoded_stream = stream.pipe(decoder({
+      channels: 2,
+      bitDepth: 16,
+      sampleRate: 44100,
+    }));
+    this.audio_stream = this.decoded_stream.pipe(this.volume);
+    this.audio_stream.pipe(this.speaker);
 
     console.info('play');
 
@@ -60,12 +66,18 @@ module.exports = class Speaker {
     this.decoded_stream.pipe(this.speaker);
   }
 
+  adjustVolume(volume) {
+    this.volume.setVolume(volume);
+  }
+
   _createSpeaker() {
     this.speaker = new Spkr({
-      channels: 1,
+      channels: 2,
       bitDepth: 16,
       sampleRate: 44100,
     });
+    this.volume = new Volume();
+    this.volume.setVolume(1);
   }
 
   _closeAllListeners() {

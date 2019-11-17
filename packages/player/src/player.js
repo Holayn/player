@@ -95,6 +95,7 @@ module.exports = class Player {
     console.info('stopping player');
     this.nowPlaying = null;
     this.isPlaying = false;
+    this.queue = [];
     this.speaker.stop();
   }
 
@@ -108,6 +109,10 @@ module.exports = class Player {
       this.nowPlaying = null;
       this._next();
     });
+  }
+
+  adjustVolume(volume) {
+    this.speaker.adjustVolume(volume);
   }
 
   async _play(track) {
