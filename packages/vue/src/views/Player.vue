@@ -4,7 +4,7 @@
       <div class="card-content">
         <span class="card-title">Now Playing</span>
         <p>{{ nowPlaying }}</p>
-        <button class="waves-effect waves-light btn" @click="getNowPlaying()">refresh</button>
+        <button class="waves-effect waves-light btn" @click="getNowPlaying(); getQueue();">refresh</button>
       </div>
     </div>
     <div class="row">
@@ -50,6 +50,12 @@
         <button class="waves-effect waves-light btn" @click="next()">Next</button>
       </div>
     </div>
+    <div class="row">
+      <div class="col s12" style="flex-direction: column">
+        Queue:
+        <ul v-for="track in queue" :key="track.name">{{ track.name }} at <a :href="track.url" target="_blank">{{ track.url }}</a></ul>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -62,6 +68,7 @@ import { Toast } from 'materialize-css';
 })
 export default class Player extends Vue {
   public nowPlaying: string = '';
+  public queue: Record<string, any>[] = [];
   public loadTrackUrl: string = '';
   public loadPlaylistUrl: string = '';
   public vol: string = '';
@@ -75,6 +82,17 @@ export default class Player extends Vue {
       return;
     }
     this.nowPlaying = '';
+  }
+  public async getQueue() {
+    const res = await fetch(`${this.$store.getters.getBaseUrl}/queue`).catch((e) => {
+      this.handleError(e);
+    });
+    if (res) {
+      const data = await res.json();
+      this.queue = data;
+      return;
+    }
+    this.queue = [];
   }
   public async loadTrack() {
     try {
