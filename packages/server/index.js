@@ -4,8 +4,7 @@ const winston = require('winston');
 const expressWinston = require('express-winston');
 const bodyParser = require('body-parser');
 
-const Player = require('./player');
-
+const Player = require('player');
 const {receiveMail} = require('./mail');
 
 const app = express();

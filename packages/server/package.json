@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "player-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,12 +17,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-winston": "^4.0.1",
-    "fluent-ffmpeg": "^2.1.2",
     "googleapis": "^45.0.0",
-    "lame": "^1.2.4",
-    "speaker": "0.4.0",
     "winston": "^3.2.1",
-    "ytdl-core": "^1.0.0",
-    "ytpl": "^0.1.17"
+    "player": "^1.0.0"
   }
 }
