@@ -107,7 +107,6 @@ module.exports = class Player {
     this.speaker.stop().then(() => {
       this.isPlaying = false;
       this.nowPlaying = null;
-      this._next();
     });
   }
 

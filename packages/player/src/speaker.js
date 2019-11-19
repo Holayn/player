@@ -107,18 +107,18 @@ module.exports = class Speaker {
   _closeStreams() {
     this._closeAllListeners();
     return new Promise((resolve) => {
-      if (!this.audio_stream || !this.decoded_stream) {
+      if (!this.current_stream || !this.decoded_stream) {
         resolve();
         return;
       }
-      this.audio_stream.on('close', () => {
-        console.info('closing audio stream');
-        this.audio_stream = null;
+      this.current_stream.on('close', () => {
+        console.info('closing current_stream');
+        this.current_stream = null;
         resolve();
       });
 
       this.decoded_stream.unpipe(this.speaker).end();
-      this.audio_stream.destroy();
+      this.current_stream.destroy();
     });
   }
 
