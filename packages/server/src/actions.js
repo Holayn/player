@@ -8,10 +8,12 @@ const ARMED = /Ring Alarm is in Home Mode|Ring Alarm is in Away Mode/g;
 async function playMusicHandler(player, subject) {
   if (player.isPlaying) {
     if (subject.match(ARMED)) {
+      console.log('mail arrived with armed, so stopping...')
       player.stop();
     }
   } else {
     if (subject.match(DISARMED)) {
+      console.log('mail arrived with disarmed, so starting...')
       const tracks = await db.getTracks();
   
       for(let i=0; i<tracks.length; i++) {
