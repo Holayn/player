@@ -9,6 +9,7 @@ module.exports = class Speaker {
   constructor() {
     this.decoded_stream = null;
     this.audio_stream = null;
+    this.speaker = null;
     this.currentVolume = 1;
   }
 

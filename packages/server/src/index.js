@@ -5,7 +5,7 @@ const expressWinston = require('express-winston');
 const bodyParser = require('body-parser');
 
 const Player = require('player');
-const {receiveMail} = require('./mail');
+// const {receiveMail} = require('./mail');
 
 const app = express();
 app.use(cors());
@@ -39,6 +39,7 @@ app.post('/load', async (req, res) => {
     await player.load(url);
     res.sendStatus(200);
   } catch (e) {
+    console.error(e);
     res.sendStatus(500);
     return;
   }
@@ -100,5 +101,5 @@ app.post('/adjustVolume', (req, res) => {
 function init() {
   player = new Player();
 
-  receiveMail(player);
+  // receiveMail(player);
 }
