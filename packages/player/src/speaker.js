@@ -21,43 +21,52 @@ module.exports = class Speaker {
     return this._destroy();
   }
 
-  async play(url) {
+  async play(url, retry = false) {
     if (this.speaker) {
       this._closeSpeaker();
     }
     this.init();
 
-    const audio = ytdl(url, {
-      audioFormat: 'mp3',
-    });
-    const ffmpeg = new FFmpeg(audio);
-
-    let stream = new Stream.PassThrough();
-
-    ffmpeg.format('mp3').on('error', (err, stdout, stderr) => {
-      setTimeout(() => {
-        console.log('something went wrong, retrying...');
-        this.play(url);
-        return;
-      }, 3000);
-    }).pipe(stream)
-
-    this.decoded_stream = stream.pipe(decoder({
-      channels: 2,
-      bitDepth: 16,
-      sampleRate: 44100,
-    }));
-    this.audio_stream = this.decoded_stream.pipe(this.volume);
-    this.current_stream = this.audio_stream.pipe(this.speaker);
-
-    console.info('play');
-
-    return new Promise((resolve) => {
-      this.current_stream.on('close', () => {
-        console.info('finished playing track');
-        resolve();
+    try {
+      const audio = ytdl(url, {
+        audioFormat: 'mp3',
       });
-    });
+      const ffmpeg = new FFmpeg(audio);
+  
+      let stream = new Stream.PassThrough();
+  
+      ffmpeg.format('mp3').on('error', (err, stdout, stderr) => {
+        setTimeout(() => {
+          console.log('something went wrong, retrying...');
+          this.play(url);
+          return;
+        }, 3000);
+      }).pipe(stream)
+  
+      this.decoded_stream = stream.pipe(decoder({
+        channels: 2,
+        bitDepth: 16,
+        sampleRate: 44100,
+      }));
+      this.audio_stream = this.decoded_stream.pipe(this.volume);
+      this.current_stream = this.audio_stream.pipe(this.speaker);
+  
+      console.info('play');
+  
+      return new Promise((resolve) => {
+        this.current_stream.on('close', () => {
+          console.info('finished playing track');
+          resolve();
+        });
+      });
+    } catch (e) {
+      console.error(e);
+      if (!retry) {
+        setTimeout(function() {
+          this.play(url, true);
+        }, 3000);
+      }
+    }
   }
 
   pause() {

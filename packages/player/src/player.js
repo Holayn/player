@@ -130,7 +130,7 @@ module.exports = class Player {
     } catch (e) {
       console.error(e);
       // try again in a few seconds
-      if (retry) {
+      if (!retry) {
         setTimeout(function() {
           this._play(track, true);
         }, 3000);
