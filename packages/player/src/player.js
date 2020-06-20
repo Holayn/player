@@ -10,8 +10,12 @@ class Track {
   }
 
   async getInfo() {
-    const info = await ytdl.getInfo(this.url);
-    this.name = info.title;
+    try {
+      const info = await ytdl.getInfo(this.url);
+      this.name = info.title;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
@@ -116,7 +120,7 @@ module.exports = class Player {
     }
   }
 
-  async _play(track) {
+  async _play(track, retry = false) {
     console.info('playing track: ' + track.name);
     this.isPlaying = true;
     this.nowPlaying = track;
@@ -124,7 +128,13 @@ module.exports = class Player {
     try {
       await this.speaker.play(track.url);
     } catch (e) {
-      return e;
+      console.error(e);
+      // try again in a few seconds
+      if (retry) {
+        setTimeout(function() {
+          this._play(track, true);
+        }, 3000);
+      }
     }
 
 
