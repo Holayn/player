@@ -22,11 +22,6 @@ module.exports = class Speaker {
   }
 
   async play(url, retry = false) {
-    if (this.speaker) {
-      this._closeSpeaker();
-    }
-    this.init();
-
     try {
       const audio = ytdl(url, {
         audioFormat: 'mp3',
@@ -83,13 +78,17 @@ module.exports = class Speaker {
   }
 
   _createSpeaker() {
-    this.speaker = new Spkr({
-      channels: 2,
-      bitDepth: 16,
-      sampleRate: 44100,
-    });
-    this.volume = new Volume();
-    this.volume.setVolume(this.currentVolume);
+    try {
+      this.speaker = new Spkr({
+        channels: 2,
+        bitDepth: 16,
+        sampleRate: 44100,
+      });
+      this.volume = new Volume();
+      this.volume.setVolume(this.currentVolume);
+    } catch (e) {
+      this._createSpeaker();
+    }
   }
 
   _closeAllListeners() {

@@ -26,6 +26,8 @@ module.exports = class Player {
     this.nowPlaying = null;
     
     this.speaker = new Speaker();
+    this.speaker.init();
+
     this.queue = [];
   }
 

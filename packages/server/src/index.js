@@ -28,8 +28,10 @@ app.use(expressWinston.logger({
   ignoreRoute: function (req, res) { return false; }
 }));
 
-app.listen(8000, () => {
-  console.info('Listening on 8000');
+const port = process.env.PORT || 8000;
+
+app.listen(port, () => {
+  console.info(`Listening on ${port}`);
   init();
 });
 
