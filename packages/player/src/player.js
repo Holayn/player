@@ -14,7 +14,8 @@ class Track {
       const info = await ytdl.getInfo(this.url);
       this.name = info.title;
     } catch (e) {
-      console.error(e);
+      console.log('getInfo(): error');
+      console.log(e);
     }
   }
 }
@@ -67,6 +68,7 @@ module.exports = class Player {
           const track = new Track(link);
           track.name = vid.title;
           this.queue.push(track);
+	  console.log(`playlist(url): adding ${track} to queue`);
         });
   
         if (canPlay) {

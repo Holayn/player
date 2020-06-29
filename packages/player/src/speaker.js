@@ -13,9 +13,7 @@ module.exports = class Speaker {
     this.currentVolume = 1;
   }
 
-  init() {
-    this._createSpeaker();
-  }
+  init() {}
 
   stop() {
     return this._destroy();
@@ -23,13 +21,14 @@ module.exports = class Speaker {
 
   async play(url, retry = false) {
     try {
-      const audio = ytdl(url, {
+      this._createSpeaker();
+      this.audio = ytdl(url, {
         audioFormat: 'mp3',
       });
-      const ffmpeg = new FFmpeg(audio);
+      const ffmpeg = new FFmpeg(this.audio);
   
       let stream = new Stream.PassThrough();
-  
+      
       ffmpeg.format('mp3').on('error', (err, stdout, stderr) => {
         setTimeout(() => {
           console.log('something went wrong, retrying...');
@@ -55,7 +54,7 @@ module.exports = class Speaker {
         });
       });
     } catch (e) {
-      console.error(e);
+      console.log(e);
       if (!retry) {
         setTimeout(function() {
           this.play(url, true);
@@ -78,39 +77,20 @@ module.exports = class Speaker {
   }
 
   _createSpeaker() {
-    try {
-      this.speaker = new Spkr({
-        channels: 2,
-        bitDepth: 16,
-        sampleRate: 44100,
-      });
-      this.volume = new Volume();
-      this.volume.setVolume(this.currentVolume);
-    } catch (e) {
-      this._createSpeaker();
-    }
-  }
+    console.log('_createSpeaker(): creating new speaker');
+    this.speaker = new Spkr({
+      channels: 2,
+      bitDepth: 16,
+      sampleRate: 44100,
+    });
+    this.volume = new Volume();
+    this.volume.setVolume(this.currentVolume);    
+ }
 
   _closeAllListeners() {
     if (this.audio_stream) {
       this.audio_stream.removeAllListeners('close');
     }
-  }
-
-  _closeSpeaker() {
-    return new Promise((resolve) => {
-      if (!this.speaker) {
-        resolve();
-        return;
-      }
-      this.speaker.on('close', () => {
-        console.info('closing speaker');
-        this.speaker = null;
-        resolve();
-      });
-
-      this.speaker.close();
-    });
   }
 
   _closeStreams() {
@@ -127,7 +107,7 @@ module.exports = class Speaker {
       });
 
       this.decoded_stream.unpipe(this.speaker).end();
-      this.current_stream.destroy();
+      this.audio.destroy();
     });
   }
 
